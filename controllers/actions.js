@@ -5,6 +5,80 @@ import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import Account from "../models/Account.js";
 import Category from '../models/category.js';
+import Product from '../models/product.js';
+import Auth from './auth.js';
+
+router.get('/getProductsByCategoryId/:id', Auth, async(request,response) => {
+    const cid = request.params.id;
+    Product.find({associateCategory: cid})
+    .populate('associateAccount')
+    .populate('associateCategory')
+    .then(allProducts => {
+        return response.status(200).json({
+            message: allProducts
+        });
+    })
+    .catch(error => {
+        return response.status(500).json({
+            message: error.message
+        });
+    })
+})
+
+
+router.get('/getAllProducts', Auth, async(request,response) => {
+    Product.find()
+    .populate('associateAccount')
+    .populate('associateCategory')
+    .then(allProducts => {
+        return response.status(200).json({
+            message: allProducts
+        });
+    })
+    .catch(error => {
+        return response.status(500).json({
+            message: error.message
+        });
+    })
+})
+
+
+router.post('/addProduct', Auth, async(request, response) => {
+
+    const {
+        associateCategory,
+        productName,
+        productPrice,
+        productDescription,
+        productImage,
+        productStatus
+    } = request.body;
+
+    const id = mongoose.Types.ObjectId();
+
+    const _product = new Product({
+        _id : id,
+        associateAccount:request.user._id,
+        associateCategory:associateCategory,
+        productName:productName,
+        productPrice:productPrice,
+        productDescription:productDescription,
+        productImage:productImage,
+        productStatus:productStatus
+    });
+    _product.save()
+    .then(product_added => {
+        return response.status(200).json({
+            message: product_added
+        });
+    })
+    .catch(error => {
+        return response.status(500).json({
+            message: error.message
+        });
+    })
+})
+
 
 router.get('/getCategories', async(request,response) => {
     //OPTION 1

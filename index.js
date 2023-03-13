@@ -10,13 +10,12 @@ app.use(express.urlencoded({extended:false}));
 app.use(express.json());
 
 const mongo_url = process.env.MONGO_URL;
-const port = process.env.PORT;
+const port = process.env.PORT; 
 
 app.use('/api', actions);
 mongoose.set({'strictQuery':false});
 mongoose.connect(mongo_url)
 .then(results => {
-    console.log(results);
     app.listen(port, function(){
         console.log(`Server is running via port ${port}`);
     })
